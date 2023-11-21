@@ -1,0 +1,59 @@
+#import packages
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+#read csv file
+food_file = pd.read_csv("FoodBalanceSheets_E_Africa_NOFLAG - FoodBalanceSheets_E_Africa_NOFLAG.csv.csv", encoding="latin-1")
+
+# getting the mean and std for year 2015
+print (food_file['Y2015'].describe())
+
+# total wine production in 2015 and 2018
+total_wine = food_file['Item'] == 'Wine'
+print (food_file['Y2015'][total_wine].sum())
+print (food_file['Y2018'][total_wine].sum())
+
+# groupby Element
+group = food_file.groupby('Element')['Y2014'].sum()
+# print (group)
+
+# unique countries in the dataset
+countries = (food_file['Area'].unique())
+print (len(countries))
+
+# Element with highest sum in 2018
+Food_2018 = food_file.groupby('Element', as_index=False)['Y2018'].sum()
+print (Food_2018[Food_2018['Y2018'] == Food_2018['Y2018'].max()])
+
+# Total number and percentage of missing data in 2016
+total_2016 = len (food_file['Y2016'])
+total_missing_2016 = food_file['Y2016'].isnull().sum()
+print (f'''The total missing value in 2016 is: {total_missing_2016}. 
+percentage of missing value is: {round (total_missing_2016/total_2016 * 100, 3)}''')
+
+# Mean and std across the dataset for 2015
+mean_std_2015 = food_file['Y2015']
+print (round(mean_std_2015.mean(), 2), round(mean_std_2015.std(), 2))
+
+# Import quantity of Algeria
+import_Algeria = food_file[(food_file['Area'] == 'Algeria') & (food_file['Element'] == 'Import Quantity')]
+print (import_Algeria['Y2018'].sum())
+
+# Highest among Protein supply quantity (g/capita/day), 
+# Tourist consumption, Fat supply quantity (g/capita/day), Stock Variation, 
+print (Food_2018.sort_values(by='Y2018', ascending=True))
+
+# Plotting correlation graph
+cols = ['Y2014', 'Y2015', 'Y2016', 'Y2017', 'Y2018']
+correlations = {}
+for year in cols:
+    correlation = food_file['Element Code'].corr(food_file[year])
+    correlations[year] = correlation
+
+print (max(correlations.values()))
+max_keys = [key for key, value in correlations.items() if value == max(correlations.values())]
+print (f'the highest correlation is: {max_keys} from {max(correlations.values())}')
+
+
